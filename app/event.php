@@ -8,10 +8,26 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-// $Id$
 
-if (is_file($_SERVER["DOCUMENT_ROOT"] . $_SERVER["SCRIPT_NAME"])) {
-    return false;
-} else {
-    require __DIR__ . "/index.php";
-}
+// 事件定义文件
+return [
+    'bind'      => [
+    ],
+    'listen'    => [
+        'AppInit'      => [
+            'think\listener\LoadLangPack',
+            'think\listener\RouteCheck',
+        ],
+        'AppBegin'     => [
+            'think\listener\CheckRequestCache',
+        ],
+        'ActionBegin'  => [],
+        'AppEnd'       => [],
+        'LogLevel'     => [],
+        'LogWrite'     => [],
+        'ResponseSend' => [],
+        'ResponseEnd'  => [],
+    ],
+    'subscribe' => [
+    ],
+];

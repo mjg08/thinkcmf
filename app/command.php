@@ -1,27 +1,12 @@
 <?php
 // +----------------------------------------------------------------------
-// | ThinkCMF [ WE CAN DO IT MORE SIMPLE ]
+// | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2013-2018 http://www.thinkcmf.com All rights reserved.
+// | Copyright (c) 2006-2016 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
-// | Author: Dean <zxxjjforever@163.com>
+// | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-$apps = cmf_scan_dir(APP_PATH . '*', GLOB_ONLYDIR);
-
-$returnCommands = [];
-
-foreach ($apps as $app) {
-    $commandFile = APP_PATH . $app . '/command.php';
-
-    if (file_exists($commandFile)) {
-        $commands       = include $commandFile;
-
-        $returnCommands = array_merge($returnCommands, $commands);
-    }
-
-}
-
-return $returnCommands;
+return [];
