@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkCMF [ WE CAN DO IT MORE SIMPLE ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2013-2018 http://www.thinkcmf.com All rights reserved.
+// | Copyright (c) 2013-2019 http://www.thinkcmf.com All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -99,7 +99,7 @@ class RouteModel extends Model
 
         $route_file = $routeDir . "route.php";
 
-        file_put_contents($route_file, "<?php\treturn " . stripslashes(var_export($allRoutes, true)) . ";");
+        file_put_contents($route_file, "<?php\treturn " . var_export($allRoutes, true) . ";");
 
         return $cacheRoutes;
     }
@@ -172,8 +172,7 @@ class RouteModel extends Model
 
     public function existsRoute($url, $fullUrl)
     {
-
-        $findRouteCount = $this->where(['url' => $url, 'full_url' => ['neq', $fullUrl]])->count();
+        $findRouteCount = $this->where('url', $url)->where('full_url', 'neq', $fullUrl)->count();
 
         return $findRouteCount > 0 ? true : false;
     }
@@ -182,6 +181,10 @@ class RouteModel extends Model
     {
         $fullUrl   = $this->buildFullUrl($action, $vars);
         $findRoute = $this->where('full_url', $fullUrl)->find();
+
+        if (preg_match("/[()'\";]/", $url)) {
+            return false;
+        }
 
         if ($findRoute) {
             if (empty($url)) {

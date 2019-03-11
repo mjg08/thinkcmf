@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkCMF [ WE CAN DO IT MORE SIMPLE ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2013-2018 http://www.thinkcmf.com All rights reserved.
+// | Copyright (c) 2013-2019 http://www.thinkcmf.com All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +---------------------------------------------------------------------
@@ -19,9 +19,7 @@ use think\facade\Hook;
 
 // 应用公共文件
 
-//设置插件入口路由
-Route::any('plugin/[:_plugin]/[:_controller]/[:_action]', "\\cmf\\controller\\PluginController@index");
-Route::get('new_captcha', "\\cmf\\controller\\CaptchaController@index");
+
 
 /**
  * 获取当前登录的管理员ID
@@ -200,7 +198,7 @@ function cmf_get_theme_path($theme = null)
         $theme = cmf_get_current_theme();
     }
 
-    return './' . $themePath . $theme;
+    return WEB_ROOT . $themePath . $theme;
 }
 
 /**
@@ -360,7 +358,7 @@ function cmf_save_var($path, $var)
 
 /**
  * 设置动态配置
- * @param array $data <br>如：["cmf_default_theme"=>'simpleboot3'];
+ * @param array $data <br>如：['template' => ['cmf_default_theme' => 'default']];
  * @return boolean
  */
 function cmf_set_dynamic_config($data)
@@ -434,8 +432,13 @@ function cmf_get_cmf_setting()
 
 /**
  * 更新CMF系统的设置，此类设置用于全局
- * @param array $data
- * @return boolean
+ * @param $data
+ * @return bool
+ * @throws \think\Exception
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ * @throws \think\exception\PDOException
  */
 function cmf_set_cmf_setting($data)
 {
@@ -452,6 +455,11 @@ function cmf_set_cmf_setting($data)
  * @param array  $data    配置值，数组
  * @param bool   $replace 是否完全替换
  * @return bool 是否成功
+ * @throws \think\Exception
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ * @throws \think\exception\PDOException
  */
 function cmf_set_option($key, $data, $replace = false)
 {
@@ -472,7 +480,7 @@ function cmf_set_option($key, $data, $replace = false)
 
         $option['option_value'] = json_encode($data);
         Db::name('option')->where('option_name', $key)->update($option);
-        Db::name('option')->getLastSql();
+//        echo Db::name('option')->getLastSql() . "\n";
     } else {
         $option['option_name']  = $key;
         $option['option_value'] = json_encode($data);
@@ -626,6 +634,7 @@ function cmf_strip_chars($str, $chars = '?<*.>\'\"')
  *                        "error"=>0|1,//0代表出错<br>
  *                        "message"=> "出错信息"<br>
  *                        );
+ * @throws phpmailerException
  */
 function cmf_send_email($address, $subject, $message)
 {
@@ -872,6 +881,11 @@ function cmf_asset_relative_url($assetUrl)
  * @param boolean $ipLimit    ip限制,false为不限制，true为限制
  * @param int     $expire     距离上次访问的最小时间单位s，0表示不限制，大于0表示最后访问$expire秒后才可以访问
  * @return true 可访问，false不可访问
+ * @throws \think\Exception
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ * @throws \think\exception\PDOException
  */
 function cmf_check_user_action($object = "", $countLimit = 1, $ipLimit = false, $expire = 0)
 {
@@ -1028,7 +1042,7 @@ function hook_one($hook, &$params = null)
 }
 
 /**
- * 获取插件类的类名
+ * 获取插件类名
  * @param string $name 插件名
  * @return string
  */
@@ -1041,8 +1055,8 @@ function cmf_get_plugin_class($name)
 }
 
 /**
- * 获取插件类的配置
- * @param string $name 插件名
+ * 获取插件配置
+ * @param string $name 插件名，大驼峰格式
  * @return array
  */
 function cmf_get_plugin_config($name)
@@ -1220,9 +1234,9 @@ function cmf_alpha_id($in, $to_num = false, $pad_up = 4, $passKey = null)
 
 /**
  * 验证码检查，验证完后销毁验证码
- * @param string $value
- * @param string $id
- * @param bool   $reset
+ * @param string $value 要验证的字符串
+ * @param string $id    验证码的ID
+ * @param bool   $reset 验证成功后是否重置
  * @return bool
  */
 function cmf_captcha_check($value, $id = "", $reset = true)
@@ -1294,6 +1308,9 @@ function cmf_get_file_extension($filename)
  * @param string  $account 手机或邮箱
  * @param integer $length  验证码位数,支持4,6,8
  * @return string 数字验证码
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
  */
 function cmf_get_verification_code($account, $length = 6)
 {
@@ -1424,11 +1441,14 @@ function cmf_check_verification_code($account, $code, $clear = false)
  * 清除某个手机或邮箱的数字验证码,一般在验证码验证正确完成后
  * @param string $account 手机或邮箱
  * @return boolean true：手机验证码正确，false：手机验证码错误
+ * @throws \think\Exception
+ * @throws \think\exception\PDOException
  */
 function cmf_clear_verification_code($account)
 {
     $verificationCodeQuery = Db::name('verification_code');
-    $verificationCodeQuery->where('account', $account)->update(['code' => '']);
+    $result                = $verificationCodeQuery->where('account', $account)->update(['code' => '']);
+    return $result;
 }
 
 /**
@@ -1453,6 +1473,11 @@ function file_exists_case($filename)
  * @param $userId
  * @param $deviceType
  * @return string 用户 token
+ * @throws \think\Exception
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ * @throws \think\exception\PDOException
  */
 function cmf_generate_user_token($userId, $deviceType)
 {
@@ -1530,7 +1555,10 @@ function cmf_is_ssl()
 /**
  * 获取CMF系统的设置，此类设置用于全局
  * @param string $key 设置key，为空时返回所有配置信息
- * @return mixed
+ * @return array|bool|mixed
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
  */
 function cmf_get_cmf_settings($key = "")
 {
@@ -1558,6 +1586,7 @@ function cmf_get_cmf_settings($key = "")
 }
 
 /**
+ * @deprecated
  * 判读是否sae环境
  * @return bool
  */
@@ -1605,6 +1634,9 @@ function cmf_url_encode($url, $params)
  * @param bool|string  $suffix 生成的URL后缀
  * @param bool|string  $domain 域名
  * @return string
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
  */
 function cmf_url($url = '', $vars = '', $suffix = true, $domain = false)
 {
@@ -1664,8 +1696,6 @@ function cmf_url($url = '', $vars = '', $suffix = true, $domain = false)
     if (!empty($anchor)) {
         $url = $url . '#' . $anchor;
     }
-
-
 
 //    if (!empty($domain)) {
 //        $url = $url . '@' . $domain;
@@ -1797,6 +1827,11 @@ function cmf_curl_get($url)
 /**
  * 用户操作记录
  * @param string $action 用户操作
+ * @throws \think\Exception
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ * @throws \think\exception\PDOException
  */
 function cmf_user_action($action)
 {

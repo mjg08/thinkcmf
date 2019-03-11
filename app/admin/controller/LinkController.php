@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkCMF [ WE CAN DO IT MORE SIMPLE ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2013-2018 http://www.thinkcmf.com All rights reserved.
+// | Copyright (c) 2013-2019 http://www.thinkcmf.com All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -91,7 +91,7 @@ class LinkController extends AdminBaseController
         }
         $linkModel->allowField(true)->save($data);
 
-        $this->success("添加成功！", url("link/index"));
+        $this->success("添加成功！", url("Link/index"));
     }
 
     /**
@@ -142,7 +142,7 @@ class LinkController extends AdminBaseController
         }
         $linkModel->allowField(true)->isUpdate(true)->save($data);
 
-        $this->success("保存成功！", url("link/index"));
+        $this->success("保存成功！", url("Link/index"));
     }
 
     /**
